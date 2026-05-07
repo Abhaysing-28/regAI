@@ -250,4 +250,4 @@ if tab_labels:
         st.warning("No agent outputs generated. Check that your OPENROUTER_API_KEY is set in .env")
 
 elif run and not query.strip():
-st.warning("Please enter a query before running.")
+    st.warning("Please enter a query before running.")
