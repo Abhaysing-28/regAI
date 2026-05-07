@@ -11,3 +11,4 @@ pypdf==5.0.1
 python-dotenv==1.0.1
 colorama==0.4.6
 langsmith>=0.1.0
+pillow>=10.4.0
