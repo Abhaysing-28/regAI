@@ -12,9 +12,9 @@ load_dotenv()
 
 # LangSmith tracing setup
 os.environ["LANGCHAIN_TRACING_V2"] = os.getenv("LANGCHAIN_TRACING_V2", "false")
-os.environ["LANGCHAIN_API_KEY"]    = os.getenv("LANGCHAIN_API_KEY", "")
-os.environ["LANGCHAIN_PROJECT"]    = os.getenv("LANGCHAIN_PROJECT", "RegAI")
-os.environ["LANGCHAIN_ENDPOINT"]   = "https://api.smith.langchain.com"
+os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY", "")
+os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGCHAIN_PROJECT", "RegAI")
+os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -78,6 +78,7 @@ with st.sidebar:
     else:  # Upload your own
         # Create tmp directory if it doesn't exist
         import tempfile
+
         tmp_dir = tempfile.mkdtemp()
 
         # Upload regulatory report
@@ -151,102 +152,102 @@ if run and query.strip():
         graph = build_graph()
 
     initial_state = {
-        "user_query":    query,
-        "report_path":   report_path,
-        "log_path":      log_path,
+        "user_query": query,
+        "report_path": report_path,
+        "log_path": log_path,
         "report_path_compare": report_path_compare if 'report_path_compare' in locals() else None,
-        "messages":      [],
+        "messages": [],
         "agents_called": [],
         "anomaly_report": None,
-        "debug_report":   None,
-        "rag_answer":     None,
-        "final_summary":  None,
+        "debug_report": None,
+        "rag_answer": None,
+        "final_summary": None,
         "comparison_report": None,
-        "next_agent":     None,
+        "next_agent": None,
     }
 
     progress = st.empty()
-    result   = {}
+    result = {}
 
-     with st.spinner("Agents working..."):
-         # Stream graph execution with higher recursion limit to prevent GraphRecursionError
-         # This allows the supervisor to route through multiple agents without hitting the limit
-         config = {"recursion_limit": 100}
-         for step in graph.stream(initial_state, config=config):
-             node_name = list(step.keys())[0]
-             state     = list(step.values())[0]
-             if node_name != "supervisor":
-                 progress.info(f"⚡ Agent running: **{node_name.replace('_', ' ').title()}**")
-             result = state
+    with st.spinner("Agents working..."):
+        # Stream graph execution with higher recursion limit to prevent GraphRecursionError
+        # This allows the supervisor to route through multiple agents without hitting the limit
+        config = {"recursion_limit": 100}
+        for step in graph.stream(initial_state, config=config):
+            node_name = list(step.keys())[0]
+            state = list(step.values())[0]
+            if node_name != "supervisor":
+                progress.info(f"⚡ Agent running: **{node_name.replace('_', ' ').title()}**")
+            result = state
 
-    progress.empty()
+progress.empty()
 
-    # ── Results Display ────────────────────────────────────────────────────
-    agents_called = result.get("agents_called", [])
+# ── Results Display ────────────────────────────────────────────────────
+agents_called = result.get("agents_called", [])
 
-    # Agent badges
-    badge_map = {
-        "anomaly_detector":  ("badge-anomaly",  "🔍 Anomaly Detector"),
-        "pipeline_debugger": ("badge-debug",    "🐛 Pipeline Debugger"),
-        "rag_agent":         ("badge-rag",      "📚 RAG Agent"),
-        "report_comparator": ("badge-comparator", "🔄 Report Comparator"),
-        "summarizer":        ("badge-summary",  "📋 Summarizer"),
-    }
-    badge_html = " ".join([
-        f'<span class="agent-badge {badge_map[a][0]}">{badge_map[a][1]}</span>'
-        for a in agents_called if a in badge_map
-    ])
-    st.markdown(f"**Agents invoked:** {badge_html}", unsafe_allow_html=True)
-    st.divider()
+# Agent badges
+badge_map = {
+    "anomaly_detector": ("badge-anomaly", "🔍 Anomaly Detector"),
+    "pipeline_debugger": ("badge-debug", "🐛 Pipeline Debugger"),
+    "rag_agent": ("badge-rag", "📚 RAG Agent"),
+    "report_comparator": ("badge-comparator", "🔄 Report Comparator"),
+    "summarizer": ("badge-summary", "📋 Summarizer"),
+}
+badge_html = " ".join([
+    f'<span class="agent-badge {badge_map[a][0]}">{badge_map[a][1]}</span>'
+    for a in agents_called if a in badge_map
+])
+st.markdown(f"**Agents invoked:** {badge_html}", unsafe_allow_html=True)
+st.divider()
 
-    # Tab display for each agent output
-    tabs = []
-    tab_labels = []
+# Tab display for each agent output
+tabs = []
+tab_labels = []
+if result.get("anomaly_report"):
+    tab_labels.append("🔍 Anomaly Report")
+if result.get("debug_report"):
+    tab_labels.append("🐛 Pipeline Debug")
+if result.get("rag_answer"):
+    tab_labels.append("📚 Regulatory Q&A")
+if result.get("comparison_report"):
+    tab_labels.append("🔄 Comparison Report")
+if result.get("final_summary"):
+    tab_labels.append("📋 Audit Summary")
+
+if tab_labels:
+    tabs = st.tabs(tab_labels)
+    idx = 0
+
     if result.get("anomaly_report"):
-        tab_labels.append("🔍 Anomaly Report")
+        with tabs[idx]:
+            st.markdown(result["anomaly_report"])
+        idx += 1
+
     if result.get("debug_report"):
-        tab_labels.append("🐛 Pipeline Debug")
+        with tabs[idx]:
+            st.markdown(result["debug_report"])
+        idx += 1
+
     if result.get("rag_answer"):
-        tab_labels.append("📚 Regulatory Q&A")
+        with tabs[idx]:
+            st.markdown(result["rag_answer"])
+        idx += 1
+
     if result.get("comparison_report"):
-        tab_labels.append("🔄 Comparison Report")
+        with tabs[idx]:
+            st.markdown(result["comparison_report"])
+        idx += 1
+
     if result.get("final_summary"):
-        tab_labels.append("📋 Audit Summary")
-
-    if tab_labels:
-        tabs = st.tabs(tab_labels)
-        idx = 0
-
-        if result.get("anomaly_report"):
-            with tabs[idx]:
-                st.markdown(result["anomaly_report"])
-            idx += 1
-
-        if result.get("debug_report"):
-            with tabs[idx]:
-                st.markdown(result["debug_report"])
-            idx += 1
-
-        if result.get("rag_answer"):
-            with tabs[idx]:
-                st.markdown(result["rag_answer"])
-            idx += 1
-
-        if result.get("comparison_report"):
-            with tabs[idx]:
-                st.markdown(result["comparison_report"])
-            idx += 1
-
-        if result.get("final_summary"):
-            with tabs[idx]:
-                st.markdown(result["final_summary"])
-                st.download_button(
-                    "⬇ Download Audit Report",
-                    data=result["final_summary"],
-                    file_name="regai_audit_report.md",
-                    mime="text/markdown")
-        else:
-            st.warning("No agent outputs generated. Check that your OPENROUTER_API_KEY is set in .env")
+        with tabs[idx]:
+            st.markdown(result["final_summary"])
+            st.download_button(
+                "⬇ Download Audit Report",
+                data=result["final_summary"],
+                file_name="regai_audit_report.md",
+                mime="text/markdown")
+    else:
+        st.warning("No agent outputs generated. Check that your OPENROUTER_API_KEY is set in .env")
 
 elif run and not query.strip():
-    st.warning("Please enter a query before running.")
+st.warning("Please enter a query before running.")
