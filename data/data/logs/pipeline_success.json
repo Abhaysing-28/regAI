@@ -1,0 +1,52 @@
+[
+  {
+    "timestamp": "2024-06-15T08:00:00",
+    "pipeline_id": "PIPE-CSDR-001",
+    "stage": "DATA_SOURCING",
+    "status": "SUCCESS",
+    "records_in": 1000,
+    "records_out": 1000,
+    "duration_sec": 62,
+    "message": "Stage DATA_SOURCING completed successfully."
+  },
+  {
+    "timestamp": "2024-06-15T08:12:00",
+    "pipeline_id": "PIPE-CSDR-001",
+    "stage": "SCHEMA_VALIDATION",
+    "status": "SUCCESS",
+    "records_in": 995,
+    "records_out": 995,
+    "duration_sec": 35,
+    "message": "Stage SCHEMA_VALIDATION completed successfully."
+  },
+  {
+    "timestamp": "2024-06-15T08:24:00",
+    "pipeline_id": "PIPE-CSDR-001",
+    "stage": "TRANSFORMATION",
+    "status": "SUCCESS",
+    "records_in": 990,
+    "records_out": 990,
+    "duration_sec": 120,
+    "message": "Stage TRANSFORMATION completed successfully."
+  },
+  {
+    "timestamp": "2024-06-15T08:36:00",
+    "pipeline_id": "PIPE-CSDR-001",
+    "stage": "RECONCILIATION",
+    "status": "SUCCESS",
+    "records_in": 985,
+    "records_out": 985,
+    "duration_sec": 85,
+    "message": "Stage RECONCILIATION completed successfully."
+  },
+  {
+    "timestamp": "2024-06-15T08:48:00",
+    "pipeline_id": "PIPE-CSDR-001",
+    "stage": "OUTPUT_GENERATION",
+    "status": "SUCCESS",
+    "records_in": 980,
+    "records_out": 980,
+    "duration_sec": 30,
+    "message": "Stage OUTPUT_GENERATION completed successfully."
+  }
+]
