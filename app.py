@@ -180,72 +180,72 @@ if run and query.strip():
                 progress.info(f"⚡ Agent running: **{node_name.replace('_', ' ').title()}**")
             result = state
 
-progress.empty()
+    progress.empty()
 
-# ── Results Display ────────────────────────────────────────────────────
-agents_called = result.get("agents_called", [])
+    # ── Results Display ────────────────────────────────────────────────────
+    agents_called = result.get("agents_called", [])
 
-# Agent badges
-badge_map = {
-    "anomaly_detector": ("badge-anomaly", "🔍 Anomaly Detector"),
-    "pipeline_debugger": ("badge-debug", "🐛 Pipeline Debugger"),
-    "rag_agent": ("badge-rag", "📚 RAG Agent"),
-    "report_comparator": ("badge-comparator", "🔄 Report Comparator"),
-    "summarizer": ("badge-summary", "📋 Summarizer"),
-}
-badge_html = " ".join([
-    f'<span class="agent-badge {badge_map[a][0]}">{badge_map[a][1]}</span>'
-    for a in agents_called if a in badge_map
-])
-st.markdown(f"**Agents invoked:** {badge_html}", unsafe_allow_html=True)
-st.divider()
+    # Agent badges
+    badge_map = {
+        "anomaly_detector": ("badge-anomaly", "🔍 Anomaly Detector"),
+        "pipeline_debugger": ("badge-debug", "🐛 Pipeline Debugger"),
+        "rag_agent": ("badge-rag", "📚 RAG Agent"),
+        "report_comparator": ("badge-comparator", "🔄 Report Comparator"),
+        "summarizer": ("badge-summary", "📋 Summarizer"),
+    }
+    badge_html = " ".join([
+        f'<span class="agent-badge {badge_map[a][0]}">{badge_map[a][1]}</span>'
+        for a in agents_called if a in badge_map
+    ])
+    st.markdown(f"**Agents invoked:** {badge_html}", unsafe_allow_html=True)
+    st.divider()
 
-# Tab display for each agent output
-tabs = []
-tab_labels = []
-if result.get("anomaly_report"):
-    tab_labels.append("🔍 Anomaly Report")
-if result.get("debug_report"):
-    tab_labels.append("🐛 Pipeline Debug")
-if result.get("rag_answer"):
-    tab_labels.append("📚 Regulatory Q&A")
-if result.get("comparison_report"):
-    tab_labels.append("🔄 Comparison Report")
-if result.get("final_summary"):
-    tab_labels.append("📋 Audit Summary")
-
-if tab_labels:
-    tabs = st.tabs(tab_labels)
-    idx = 0
-
+    # Tab display for each agent output
+    tabs = []
+    tab_labels = []
     if result.get("anomaly_report"):
-        with tabs[idx]:
-            st.markdown(result["anomaly_report"])
-        idx += 1
-
+        tab_labels.append("🔍 Anomaly Report")
     if result.get("debug_report"):
-        with tabs[idx]:
-            st.markdown(result["debug_report"])
-        idx += 1
-
+        tab_labels.append("🐛 Pipeline Debug")
     if result.get("rag_answer"):
-        with tabs[idx]:
-            st.markdown(result["rag_answer"])
-        idx += 1
-
+        tab_labels.append("📚 Regulatory Q&A")
     if result.get("comparison_report"):
-        with tabs[idx]:
-            st.markdown(result["comparison_report"])
-        idx += 1
-
+        tab_labels.append("🔄 Comparison Report")
     if result.get("final_summary"):
-        with tabs[idx]:
-            st.markdown(result["final_summary"])
-            st.download_button(
-                "⬇ Download Audit Report",
-                data=result["final_summary"],
-                file_name="regai_audit_report.md",
-                mime="text/markdown")
+        tab_labels.append("📋 Audit Summary")
+
+    if tab_labels:
+        tabs = st.tabs(tab_labels)
+        idx = 0
+
+        if result.get("anomaly_report"):
+            with tabs[idx]:
+                st.markdown(result["anomaly_report"])
+            idx += 1
+
+        if result.get("debug_report"):
+            with tabs[idx]:
+                st.markdown(result["debug_report"])
+            idx += 1
+
+        if result.get("rag_answer"):
+            with tabs[idx]:
+                st.markdown(result["rag_answer"])
+            idx += 1
+
+        if result.get("comparison_report"):
+            with tabs[idx]:
+                st.markdown(result["comparison_report"])
+            idx += 1
+
+        if result.get("final_summary"):
+            with tabs[idx]:
+                st.markdown(result["final_summary"])
+                st.download_button(
+                    "⬇ Download Audit Report",
+                    data=result["final_summary"],
+                    file_name="regai_audit_report.md",
+                    mime="text/markdown")
     else:
         st.warning("No agent outputs generated. Check that your OPENROUTER_API_KEY is set in .env")
 
