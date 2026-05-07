@@ -168,14 +168,16 @@ if run and query.strip():
     progress = st.empty()
     result   = {}
 
-    with st.spinner("Agents working..."):
-        # Stream graph execution
-        for step in graph.stream(initial_state):
-            node_name = list(step.keys())[0]
-            state     = list(step.values())[0]
-            if node_name != "supervisor":
-                progress.info(f"⚡ Agent running: **{node_name.replace('_', ' ').title()}**")
-            result = state
+     with st.spinner("Agents working..."):
+         # Stream graph execution with higher recursion limit to prevent GraphRecursionError
+         # This allows the supervisor to route through multiple agents without hitting the limit
+         config = {"recursion_limit": 100}
+         for step in graph.stream(initial_state, config=config):
+             node_name = list(step.keys())[0]
+             state     = list(step.values())[0]
+             if node_name != "supervisor":
+                 progress.info(f"⚡ Agent running: **{node_name.replace('_', ' ').title()}**")
+             result = state
 
     progress.empty()
 

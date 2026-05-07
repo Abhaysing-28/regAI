@@ -43,6 +43,11 @@ def supervisor_node(state: AgentState) -> AgentState:
     if "summarizer" in agents_called:
         return {**state, "next_agent": "FINISH"}
 
+    # Safeguard: If we've called too many agents, force finish to prevent infinite loops
+    # This can happen if the LLM keeps routing to agents without calling summarizer
+    if len(agents_called) >= 10:
+        return {**state, "next_agent": "FINISH"}
+
     prompt = ROUTING_PROMPT.format(
         agents_called=", ".join(agents_called) if agents_called else "none",
         query=state["user_query"]

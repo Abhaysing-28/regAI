@@ -45,7 +45,11 @@ def build_graph() -> StateGraph:
     for agent in ["anomaly_detector", "pipeline_debugger", "rag_agent", "summarizer", "report_comparator"]:
         graph.add_edge(agent, "supervisor")
 
-    return graph.compile()
+    return graph.compile(
+        # Set higher recursion limit to allow multi-agent routing without hitting limit
+        # This prevents GraphRecursionError when supervisor routes through multiple agents
+        config={"recursion_limit": 100}
+    )
 
 
 # Quick CLI test
